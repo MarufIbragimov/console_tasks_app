@@ -1,6 +1,6 @@
 from task import Task
 from db import create_task, get_all_tasks, get_task_by_id, edit_task, soft_delete_task, change_task_status, \
-    get_user_by_username_and_password, get_user_by_username, add_user
+    get_user_by_username_and_password, get_user_by_username, add_user, get_all_deleted_tasks
 
 
 class ConsoleApplication:
@@ -36,12 +36,12 @@ class ConsoleApplication:
         print(f"--------------Задача {task_id} успешно  добавлена--------------")
         # self.current_id += 1
 
-    def print_tasks(self, is_deleted=False):
+    def print_tasks(self):
         user_id = self.authorized_user_id
-        tasks = get_all_tasks(user_id, is_deleted)
-        print(f"--------------Список {'удалённых' if is_deleted else 'ваших'} задач:--------------")
+        tasks = get_all_tasks(user_id)
+        print("--------------Список ваших задач:--------------")
         for task in tasks:
-            print(f"{task.task_id}. {task.title}")
+            print(f"{task.id}. {task.title}")
         print("-----------------------------------------------")
 
     def edit_task(self):
@@ -114,14 +114,13 @@ class ConsoleApplication:
         else:
             print("Вы ввели несуществующий статус!")
 
-
     def print_deleted_tasks(self):
-        # user_id = self.authorized_user_id
-        # tasks = get_all_tasks(user_id)
-        # print("--------------Список удалённых задач:----------------")
-        # for task in tasks:
-        self.print_tasks(is_deleted=True)
-
+        user_id = self.authorized_user_id
+        tasks = get_all_deleted_tasks(user_id)
+        print("--------------Список ваших удаленных задач:--------------")
+        for task in tasks:
+            print(f"{task.task_id}. {task.title}")
+        print("-----------------------------------------------")
 
     def main_menu(self):
         print("Добро пожаловать в Todo-List-App!")
@@ -155,7 +154,6 @@ class ConsoleApplication:
             elif cmd == 6:
                 self.change_task_status()
             elif cmd == 7:
-                # print("В разработке")
                 self.print_deleted_tasks()
             else:
                 print("Вы ввели несуществующую команду!!!")
@@ -174,6 +172,7 @@ class ConsoleApplication:
             self.authorized_user_id = user_id
             print(f"С возвращением {full_name}")
             self.main_menu()
+
 
     def sign_up(self):
         # 1. Получить логин который хочет пользователь
